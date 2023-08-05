@@ -26,8 +26,9 @@ migration
 npx prisma migrate dev
 ```
 > migration name => ex. v0  
+> After migration, the changes will be reflected when you restart Prisma Studio.
 
-run prisma stduio  
+run prisma studio  
 ```shell
 npx prisma studio
 ```

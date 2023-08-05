@@ -237,3 +237,134 @@ export class AuthController {
     }
 }
 ```
+
+## AuthGuard jwt
+
+add UseGuards to controller  
+
+*ex. user.controller.ts*  
+```ts
+import { Controller, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { UserService } from './user.service';
+
+@UseGuards(AuthGuard('jwt'))
+@Controller('user')
+export class UserController {
+    constructor(private readonly userService: UserService) { }
+}
+```
+
+create jwt strategy  
+
+*auth/strategy/jwt.strategy.ts*  
+```ts
+import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { PassportStrategy } from '@nestjs/passport';
+import { ExtractJwt, Strategy } from 'passport-jwt';
+import { PrismaService } from '../../prisma/prisma.service';
+
+@Injectable()
+export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
+    constructor(
+        private readonly config: ConfigService,
+        private readonly prisma: PrismaService
+    ) {
+        super({
+            jwtFromRequest: ExtractJwt.fromExtractors([
+                (req) => {
+                    let jwt = null;
+                    if (req && req.cookies) {
+                        jwt = req.cookies['access_token'];
+                    }
+                    return jwt;
+                },
+            ]),
+            ignoreExpiration: false,
+            secretOrKey: config.get('JWT_SECRET')
+        });
+    }
+
+    async validate(payload: { sub: number; email: string; }) {
+        const user = await this.prisma.user.findUnique({
+            where: {
+                id: payload.sub,
+            },
+        });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        delete (user as any).hashedPassword;
+        return user;
+    }
+}
+```
+
+add JwtStrategy to providers in auth.module.ts  
+
+*auth.module.ts*
+```ts
+import { Module } from '@nestjs/common';
+import { JwtModule } from '@nestjs/jwt';
+import { PrismaModule } from '../prisma/prisma.module';
+import { AuthController } from './auth.controller';
+import { AuthService } from './auth.service';
+import { JwtStrategy } from './strategy/jwt.strategy';
+@Module({
+  imports: [PrismaModule, JwtModule.register({}),],
+  controllers: [AuthController],
+  providers: [AuthService, JwtStrategy],
+})
+export class AuthModule { }
+```
+
+## current user decorator
+
+install graphql @nestjs/graphql  
+```shell
+yarn add @nestjs/graphql
+```
+
+*auth/current-user.decorator.ts*  
+```ts
+import { ExecutionContext, createParamDecorator } from '@nestjs/common';
+import { GqlExecutionContext } from '@nestjs/graphql';
+import { User } from '@prisma/client';
+
+export const getCurrentUserByContext = (context: ExecutionContext): User => {
+    // for http
+    if (context.getType() === 'http') {
+        return context.switchToHttp().getRequest().user;
+    }
+
+    // for graphql
+    const ctx = GqlExecutionContext.create(context);
+    return ctx.getContext().req.user;
+};
+
+export const CurrentUser = createParamDecorator(
+    (_data: unknown, context: ExecutionContext) =>
+        getCurrentUserByContext(context)
+);
+```
+
+*user.contoller.ts*  
+```ts
+import { Controller, Get, UseGuards } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { User } from '@prisma/client';
+import { CurrentUser } from '../auth/current-user.decorator';
+import { UserService } from './user.service';
+
+@UseGuards(AuthGuard('jwt'))
+@Controller('user')
+export class UserController {
+    constructor(private readonly userService: UserService) { }
+
+    @Get()
+    getLoginUser(@CurrentUser() user: User): Omit<User, 'hashedPassword'> {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        delete (user as any).hashedPassword;
+        return user;
+    }
+}
+```
