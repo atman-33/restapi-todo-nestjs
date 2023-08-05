@@ -17,6 +17,16 @@ const nextConfig = {
     // For other options, see https://styled-components.com/docs/tooling#babel-plugin
     styledComponents: true,
   },
+
+  // add following insted of proxy config
+  async rewrites() {
+    return [
+      {
+        source: '/api',
+        destination: 'http://localhost:3000/',
+      },
+    ];
+  },
 };
 
 const plugins = [
