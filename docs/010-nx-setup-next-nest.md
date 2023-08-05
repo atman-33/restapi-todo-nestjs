@@ -55,7 +55,7 @@ const nextConfig = {
     return [
       {
         source: '/api',
-        destination: 'http://localhost:3000/',
+        destination: 'http://localhost:3005/',
       },
     ];
   },
@@ -71,7 +71,7 @@ const nextConfig = {
         "buildTarget": "web:build",
         "dev": true,
 -       "proxyConfig": "apps/web/proxy.conf.json"
-+       "port": 3001
++       "port": 3000
       },
       "configurations": {
         "development": {
