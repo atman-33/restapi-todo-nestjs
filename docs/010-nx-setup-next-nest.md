@@ -36,7 +36,7 @@ nx g @nx/nest:app api --frontendProject web
 ## setup proxy
 
 add rewites() in next.config.js  
-- next.config.js
+*next.config.js*  
 ```ts
 const nextConfig = {
   nx: {
@@ -62,7 +62,7 @@ const nextConfig = {
 };
 ```
 
-- web/project.json
+*web/project.json*
 ```ts
     "serve": {
       "executor": "@nx/next:server",
@@ -87,7 +87,7 @@ const nextConfig = {
 ```
 
 ## add scripts
-- package.json
+*package.json*
 ```json
   "scripts": {
     "dev": "nx run-many -t serve web api"

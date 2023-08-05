@@ -1,16 +1,16 @@
 ## serve command
 
-- run dev backend
+run dev backend  
 ```shell
 nx serve api
 ```
 
-- run dev frontend
+run dev frontend  
 ```shell
 nx serve web
 ```
 
-- run dev front and back
+run dev front and back  
 ```shell
 npm run dev
 ```

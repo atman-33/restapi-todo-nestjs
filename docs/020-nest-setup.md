@@ -1,6 +1,6 @@
 ## setup tsconfig.json
 
-- api/tsconfig.json
+*api/tsconfig.json*
 ```json
   "compilerOptions": {
     "esModuleInterop": true,
