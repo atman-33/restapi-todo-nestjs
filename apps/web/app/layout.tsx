@@ -28,6 +28,7 @@ export default function RootLayout({ children, title = 'Nextjs' }: Props) {
 
   // get csrf token
   useEffect(() => {
+    // console.log(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/csrf`);
     const getCsrfToken = async () => {
       const { data } = await axios.get(
         `${process.env.NEXT_PUBLIC_API_URL}/api/auth/csrf`

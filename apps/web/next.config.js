@@ -19,14 +19,14 @@ const nextConfig = {
   },
 
   // add following insted of proxy config
-  async rewrites() {
-    return [
-      {
-        source: '/api',
-        destination: 'http://localhost:3005/',
-      },
-    ];
-  },
+  // async rewrites() {
+  //   return [
+  //     {
+  //       source: '/api',
+  //       destination: 'http://localhost:3005/',
+  //     },
+  //   ];
+  // },
 };
 
 const plugins = [
